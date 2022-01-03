@@ -1,7 +1,7 @@
 ﻿# LED Clock Hardware
 
 ## PCB #1 Display
-A MC14499 drives the LEDs.
+A MC14499 ([datasheet](http://pdf.datasheetcatalog.com/datasheet/motorola/MC14499DW.pdf)) drives the LEDs.
 
 #### Data Cable Pinout
 ```

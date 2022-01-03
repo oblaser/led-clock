@@ -13,8 +13,8 @@ lflags = $(commonflags)
 
 src_main = ../src/main.c
 obj_main = main.o
-inc_serialport = ../src/serialPort.h
-src_serialport = ../src/serialPort.c
+inc_serialport = ../src/middleware/serialPort.h
+src_serialport = ../src/middleware/serialPort.c
 obj_serialPort = serialPort.o
 
 objs = $(obj_main) $(obj_serialPort)

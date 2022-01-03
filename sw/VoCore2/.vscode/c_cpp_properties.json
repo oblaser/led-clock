@@ -1,10 +1,18 @@
 {
+    "env": {
+        "OpenWRTinclude": "${env:sdk}\\OpenWRT-19.07.3\\toolchain-mipsel_24kc_gcc-7.5.0_musl\\include"
+    },
     "configurations": [
         {
+            "name": "VoCore2 OpenWRT",
             "defines": [
                 "__unix__",
                 "OMW_CCDEF_OPENWRT"
-            ]
+            ],
+            "includePath": [
+                "${OpenWRTinclude}"
+            ],
+            "compilerPath": ""
         }
     ],
     "version": 4

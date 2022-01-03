@@ -165,6 +165,8 @@ SPO_code SPO_open(SPO_port* port, const char* name, int baud/*, parity, nStop, n
 #endif
         }
 
+        if(r != SPO_OK && r != SPOE_FD) close(port->fd);
+
         port->code = r;
     }
     else r = SPOE_NULL;
@@ -183,7 +185,11 @@ SPO_code SPO_close(SPO_port* port)
 #ifdef OMW_PLAT_WIN
 #error "not implemented"
 #elif defined(OMW_PLAT_UNIX)
-        if(close(port->fd) == 0) r = SPO_OK;
+        if(close(port->fd) == 0)
+        {
+            port->fd = -1;
+            r = SPO_OK;
+        }
         else
         {
             r = SPOE_ERROR;
