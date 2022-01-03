@@ -68,7 +68,13 @@ int main(int argc, char** argv)
                 const time_t tNow = time(NULL);
                 struct tm* datetime = localtime(&tNow);
 
-                if(datetime) strftime(cBuffer, sizeof(buffer), "AD-%H%M1%n", datetime);
+                if(datetime)
+                {
+                    if(sprintf(cBuffer, "AD-%2i%02i%i\n", datetime->tm_hour, datetime->tm_min, (datetime->tm_sec & 0x01 ? 1 : 0)) != 9)
+                    {
+                        strcpy(cBuffer, "AD-CEEC1\n");
+                    }
+                }
                 else strcpy(cBuffer, "AD-FFFF1\n");
 
                 SPO_write(port, buffer, 9);
