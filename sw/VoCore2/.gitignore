@@ -2,3 +2,4 @@
 build/*
 !build/makefile
 !build/readme.md
+!build/spc-to-vocore_template.sh

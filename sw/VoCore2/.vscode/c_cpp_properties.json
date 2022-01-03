@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "defines": [
+                "__unix__",
+                "OMW_CCDEF_OPENWRT"
+            ]
+        }
+    ],
+    "version": 4
+}
