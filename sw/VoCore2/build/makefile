@@ -1,27 +1,31 @@
 #
 # author        Oliver Blaser
-# date          02.01.2022
+# date          03.01.2022
 # copyright     GNU GPLv3 - Copyright (c) 2022 Oliver Blaser
 #
 
-CC = /opt/toolchain-mipsel_24kc_gcc-7.5.0_musl/bin/mipsel-openwrt-linux-musl-gcc
-LINK = /opt/toolchain-mipsel_24kc_gcc-7.5.0_musl/bin/mipsel-openwrt-linux-musl-gcc
+STAGING_DIR=/opt/toolchain-mipsel_24kc_gcc-7.5.0_musl/
+cc = $(STAGING_DIR)bin/mipsel-openwrt-linux-musl-gcc
+link = $(STAGING_DIR)bin/mipsel-openwrt-linux-musl-gcc
 
-CFLAGS = -c -Wall -W -pedantic
-LFLAGS = -Wall -W -pedantic
+cflags = -c -Wall -W -pedantic
+lflags = -Wall -W -pedantic
 
-OBJS = main.o
-EXE = led-clock
+objs = main.o
+exe = led-clock
 
 # source files
-F_MAIN = ../src/main.c
+src_main = ../src/main.c
 
-$(EXE): $(OBJS)
-	$(LINK) $(LFLAGS) -o $(EXE) $(OBJS)
+$(exe): $(objs)
+	$(link) $(lflags) -o $(exe) $(objs)
 
-main.o: $(F_MAIN)
-	$(CC) $(CFLAGS) $(F_MAIN)
+main.o: pre-build $(src_main)
+	$(cc) $(cflags) $(src_main)
 
 clean:
-	rm $(OBJS)
-	rm $(EXE)
+	rm $(objs)
+	rm $(exe)
+
+pre-build:
+	@echo "pre build commands"
