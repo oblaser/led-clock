@@ -8,8 +8,3 @@ to the microcontroller.
 
 #### 2020
 The clock is now a R&D platform for the VoCore2.
-
-## VoCore2
-> [VoCore2](https://vocore.io/v2.html)
-
-UART1 is used to communicate with the clock.

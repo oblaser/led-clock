@@ -1,13 +1,8 @@
-/*
-author          Oliver Blaser
-date            03.01.2022
-copyright       GNU GPLv3 - Copyright (c) 2022 Oliver Blaser
-*/
+# VoCore2 Software
 
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+## C Types
 
+```
 int main(int argc, char** argv)
 {
     printf("sizeof types:\n");
@@ -29,6 +24,27 @@ int main(int argc, char** argv)
     printf("uint16_t: %2u\n", sizeof(uint16_t));
     printf("uint32_t: %2u\n", sizeof(uint32_t));
     printf("uint64_t: %2u\n", sizeof(uint64_t));
-
+    
     return 0;
 }
+```
+Output:
+```
+char:  1
+short:  2
+int:  4
+long:  4
+long long:  8
+float:  4
+double:  8
+long double:  8
+
+int8_t:  1
+int16_t:  2
+int32_t:  4
+int64_t:  8
+uint8_t:  1
+uint16_t:  2
+uint32_t:  4
+uint64_t:  8
+```
