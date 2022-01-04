@@ -7,7 +7,7 @@
             "name": "VoCore2 OpenWRT",
             "defines": [
                 "__unix__",
-                "OMW_CCDEF_OPENWRT"
+                "OMW_CCDEF_PLAT_OPENWRT"
             ],
             "includePath": [
                 "${OpenWRTinclude}"
