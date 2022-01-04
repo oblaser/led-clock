@@ -19,6 +19,8 @@ copyright       GNU GPLv3 - Copyright (c) 2022 Oliver Blaser
 static char envelopeData[20];
 
 static void initFlags(struct flags* flags);
+static void printHelp();
+static void printVersion();
 
 
 
@@ -42,6 +44,8 @@ int main(int argc, char** argv)
             strcpy(envelopeData, argv[i] + 11);
             flags->envelope = 1;
         }
+        else if(strcmp(argv[i], "--version") == 0) flags->version = 1;
+        else if((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0)) flags->help = 1;
         else argOk = 0;
 
         if(!argOk)
@@ -54,43 +58,47 @@ int main(int argc, char** argv)
 
     if(flags->argOk)
     {
-        SPO_port portData;
-        SPO_port* const port = &portData;
-
-        if(SPO_init(port) != SPO_OK) APP_printSpoError("SPO_init", port, flags);
-        
-        SPO_open(port, "/dev/ttyS1", 9600);
-        APP_printSpoError("SPO_open", port, flags);
-
-        if(SPO_isOpen(port))
+        if(flags->help) { printHelp(); r = 0; }
+        else if(flags->version) { printVersion(); r = 0; }
+        else
         {
-            APP_init(port, flags);
+            SPO_port portData;
+            SPO_port* const port = &portData;
 
-            if(flags->envelope)
+            if(SPO_init(port) != SPO_OK) APP_printSpoError("SPO_init", port, flags);
+            
+            SPO_open(port, "/dev/ttyS1", 9600);
+            APP_printSpoError("SPO_open", port, flags);
+
+            if(SPO_isOpen(port))
             {
-                r = APP_envelope(envelopeData);
-            }
-            else
-            {
-                int taskRes = 0;
-                while(taskRes == 0)
+                APP_init(port, flags);
+
+                if(flags->envelope)
                 {
-                    taskRes = APP_task();
-                    usleep(250 * 1000);
+                    r = APP_envelope(envelopeData);
+                }
+                else
+                {
+                    int taskRes = 0;
+                    while(taskRes == 0)
+                    {
+                        taskRes = APP_task();
+                        usleep(250 * 1000);
+                    }
+
+                    r = 1;
                 }
 
-                r = 1;
+                SPO_close(port);
+                APP_printSpoError("SPO_close", port, flags);
             }
-
-            SPO_close(port);
-            APP_printSpoError("SPO_close", port, flags);
+            else r = -3;
         }
-        else r = -3;
     }
     else
     {
-        printf("\nUsage: led-clock [-v] [--cm=(0|1|2)] [--envelope=DISPSTR]\n\n");
-
+        printf("\nTry led-clock --help\n\n");
         r = -2;
     }
 
@@ -106,4 +114,23 @@ void initFlags(struct flags* flags)
     flags->verbose = 0;
 
     flags->colonMode = APP_COLON_MODE_BLINK;
+}
+
+void printHelp()
+{
+    printf("Usage:\n");
+    printf("  led-clock [-v] [--cm=(0|1|2)]\n");
+    printf("  led-clock [-v] [--envelope=DISPSTR]\n");
+    printf("\n");
+}
+
+void printVersion()
+{
+    printf("led-clock 1.0.1-alpha\n");
+    printf("\n");
+    printf("project page: <https://github.com/oblaser/led-clock>\n");
+    printf("\n");
+    printf("Copyright (c) 2022 Oliver Blaser.\n");
+    printf("License: GNU GPLv3 <http://gnu.org/licenses/>.\n");
+    printf("This is free software. There is NO WARRANTY.\n");
 }

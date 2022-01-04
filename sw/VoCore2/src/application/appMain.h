@@ -18,7 +18,9 @@ struct flags
 {
     unsigned int argOk : 1;
     unsigned int envelope : 1;
+    unsigned int help : 1;
     unsigned int verbose : 1;
+    unsigned int version : 1;
 
     unsigned int colonMode : 2;
 };
