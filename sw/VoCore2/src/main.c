@@ -1,6 +1,6 @@
 /*
 author          Oliver Blaser
-date            03.01.2022
+date            04.01.2022
 copyright       GNU GPLv3 - Copyright (c) 2022 Oliver Blaser
 */
 
@@ -11,6 +11,8 @@ copyright       GNU GPLv3 - Copyright (c) 2022 Oliver Blaser
 #include <time.h>
 
 #include "middleware/serialPort.h"
+
+#include <unistd.h>
 
 
 struct flags
@@ -51,41 +53,33 @@ int main(int argc, char** argv)
         if(flags.verbose && port->code != SPO_OK) printSerialPortError("SPO_write", port);
 
         char bufferOld[10];
-        struct timespec tmspecOld, tmspecNow;
-        clock_gettime(CLOCK_MONOTONIC_RAW, &tmspecOld);
+        uint8_t buffer[10];
+        char* cBuffer = (char*)buffer;
 
         while(port->code == SPO_OK)
         {
-            clock_gettime(CLOCK_MONOTONIC_RAW, &tmspecNow);
+            const time_t tNow = time(NULL);
+            struct tm* datetime = localtime(&tNow);
 
-            if(timespec_diff_ms(&tmspecOld, &tmspecNow) >= 250)
+            if(datetime)
             {
-                timespec_cpy(&tmspecOld, &tmspecNow);
-
-                uint8_t buffer[10];
-                char* cBuffer = (char*)buffer;
-                
-                const time_t tNow = time(NULL);
-                struct tm* datetime = localtime(&tNow);
-
-                if(datetime)
+                if(sprintf(cBuffer, "AD-%2i%02i%i\n", datetime->tm_hour, datetime->tm_min, (datetime->tm_sec & 0x01 ? 1 : 0)) != 9)
                 {
-                    if(sprintf(cBuffer, "AD-%2i%02i%i\n", datetime->tm_hour, datetime->tm_min, (datetime->tm_sec & 0x01 ? 1 : 0)) != 9)
-                    {
-                        strcpy(cBuffer, "AD-CEEC1\n");
-                    }
-                }
-                else strcpy(cBuffer, "AD-FFFF1\n");
-
-                SPO_write(port, buffer, 9);
-                if(flags.verbose && port->code != SPO_OK) printSerialPortError("SPO_write", port);
-
-                if(flags.verbose && strncmp(cBuffer, bufferOld, 7) != 0)
-                {
-                    strcpy(bufferOld, cBuffer);
-                    printf("%s", cBuffer);
+                    strcpy(cBuffer, "AD-CEEC1\n");
                 }
             }
+            else strcpy(cBuffer, "AD-FFFF1\n");
+
+            SPO_write(port, buffer, 9);
+            if(flags.verbose && port->code != SPO_OK) printSerialPortError("SPO_write", port);
+
+            if(flags.verbose && strncmp(cBuffer, bufferOld, 7) != 0)
+            {
+                strcpy(bufferOld, cBuffer);
+                printf("%s", cBuffer);
+            }
+
+            usleep(250 * 1000);
         }
 
         SPO_close(port);
