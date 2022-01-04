@@ -1,6 +1,6 @@
 /*
 author          Oliver Blaser
-date            03.01.2022
+date            04.01.2022
 copyright       GNU GPLv3 - Copyright (c) 2022 Oliver Blaser
 */
 
@@ -9,6 +9,8 @@ Module          Serial Port
 Module abbr.    SPO
 */
 
+#ifndef IG_MW_SERIALPORT_H
+#define IG_MW_SERIALPORT_H
 
 
 // part of omw, should be moved to another file...
@@ -25,7 +27,7 @@ Module abbr.    SPO
 #if (defined(OMW_PLAT_WIN32) || defined(OMW_PLAT_WIN64))
 #define OMW_PLAT_WIN (1)
 #endif
-#ifdef OMW_CCDEF_OPENWRT
+#ifdef OMW_CCDEF_PLAT_OPENWRT
 #define OMW_PLAT_OPENWRT
 #endif
 
@@ -82,6 +84,7 @@ typedef int errno_t;
 enum SPO_CODE
 {
     SPO_OK = 0,
+    SPOE_INIT,      // just initialized
     SPOE_NULL,      // instance pointer is null
     SPOE_ERROR,     // general error
     SPOE_BAUD,      // invalid baud rate
@@ -106,6 +109,7 @@ typedef struct
     SPO_code code;
     errno_t error;
     int fd;
+    int good;
     char name[SPO_NAME_SIZE];
 } SPO_port;
 
@@ -113,7 +117,10 @@ SPO_code SPO_init(SPO_port* port);
 int SPO_isOpen(SPO_port* port);
 SPO_code SPO_open(SPO_port* port, const char* name, int baud/*, parity, nStop, nBits*/);
 SPO_code SPO_close(SPO_port* port);
+SPO_code SPO_read(SPO_port* port, uint8_t* buffer, size_t bufferSize, size_t* nBytesRead);
 SPO_code SPO_write(SPO_port* port, const uint8_t* data, size_t count);
 
-SPO_code SPO_getErrorStr(const SPO_port* port, char* buffer, size_t size);
-SPO_code SPO_getErrorStr_code(SPO_code code, errno_t stderror, char* buffer, size_t size);
+SPO_code SPO_getErrorStr(const SPO_port* port, char* buffer, size_t bufferSize);
+SPO_code SPO_getErrorStr_code(SPO_code code, errno_t stderror, char* buffer, size_t bufferSize);
+
+#endif // IG_MW_SERIALPORT_H

@@ -1,6 +1,6 @@
 /*
 author          Oliver Blaser
-date            03.01.2022
+date            04.01.2022
 copyright       GNU GPLv3 - Copyright (c) 2022 Oliver Blaser
 */
 
@@ -21,6 +21,7 @@ copyright       GNU GPLv3 - Copyright (c) 2022 Oliver Blaser
 
 
 
+static void updateInstance(SPO_port* port);
 #ifdef OMW_PLAT_UNIX
 static speed_t getUnixBaud(int baud, int* error);
 #else
@@ -39,10 +40,13 @@ SPO_code SPO_init(SPO_port* port)
     if(port)
     {
         port->baud = -1;
-        port->code = SPO_OK;
+        port->code = SPOE_INIT;
         port->error = 0;
         port->fd = -1;
         port->name[0] = 0;
+
+        if(r != SPO_OK) port->code = r;
+        updateInstance(port);
     }
     else r = SPOE_NULL;
 
@@ -55,7 +59,7 @@ int SPO_isOpen(SPO_port* port)
     
     if(port)
     {
-        if(port->fd >= 0) r = 1;
+        if(port->fd >= 0 && port->good) r = 1;
     }
 
     return r;
@@ -98,7 +102,7 @@ SPO_code SPO_open(SPO_port* port, const char* name, int baud/*, parity, nStop, n
                     tty.c_cflag &= ~CSTOPB; // clear stop field => one stop bit
                     tty.c_cflag &= ~CSIZE;
                     tty.c_cflag |= CS8; // 8bit data word
-                    //tty.c_cflag &= ~CRTSCTS; // disable RTS/CTS hardware flow control
+                    tty.c_cflag &= ~CRTSCTS; // disable RTS/CTS hardware flow control
                     tty.c_cflag |= CREAD | CLOCAL; // turn on READ & ignore ctrl lines (CLOCAL = 1)
                     
                     tty.c_lflag &= ~ICANON; // non-canonical mode
@@ -115,7 +119,7 @@ SPO_code SPO_open(SPO_port* port, const char* name, int baud/*, parity, nStop, n
                     //tty.c_oflag &= ~OXTABS; // prevent conversion of tabs to spaces (NOT PRESENT IN LINUX)
                     //tty.c_oflag &= ~ONOEOT; // prevent removal of C-d chars (0x004) in output (NOT PRESENT IN LINUX)
                     
-                    // non blocking
+                    // non blocking read
                     tty.c_cc[VTIME] = 0;
                     tty.c_cc[VMIN] = 0;
                     
@@ -165,9 +169,14 @@ SPO_code SPO_open(SPO_port* port, const char* name, int baud/*, parity, nStop, n
 #endif
         }
 
-        if(r != SPO_OK && r != SPOE_FD) close(port->fd);
+        if(!(r == SPO_OK || r == SPOE_FD))
+        {
+            close(port->fd);
+            port->fd = -1;
+        }
 
         port->code = r;
+        updateInstance(port);
     }
     else r = SPOE_NULL;
     
@@ -200,6 +209,41 @@ SPO_code SPO_close(SPO_port* port)
 #endif
 
         port->code = r;
+        updateInstance(port);
+    }
+    else r = SPOE_NULL;
+    
+    return r;
+}
+
+SPO_code SPO_read(SPO_port* port, uint8_t* buffer, size_t bufferSize, size_t* nBytesRead)
+{
+    SPO_code r = SPO_OK;
+    
+    if(port)
+    {
+        port->error = 0;
+        
+#ifdef OMW_PLAT_WIN
+#error "not implemented"
+#elif defined(OMW_PLAT_UNIX)
+        const ssize_t rdres = read(port->fd, buffer, bufferSize);
+        if(rdres < 0)
+        {
+            port->code = SPOE_ERROR;
+            port->error = errno;
+        }
+        else
+        {
+            r = SPO_OK;
+            if(nBytesRead) *nBytesRead = (size_t)rdres;
+        }
+#else
+#error "unknown platform"
+#endif
+
+        port->code = r;
+        updateInstance(port);
     }
     else r = SPOE_NULL;
     
@@ -233,19 +277,20 @@ SPO_code SPO_write(SPO_port* port, const uint8_t* data, size_t count)
 #endif
 
         port->code = r;
+        updateInstance(port);
     }
     else r = SPOE_NULL;
     
     return r;
 }
 
-SPO_code SPO_getErrorStr(const SPO_port* port, char* buffer, size_t size)
+SPO_code SPO_getErrorStr(const SPO_port* port, char* buffer, size_t bufferSize)
 {
     SPO_code r;
     
     if(port)
     {
-        r = SPO_getErrorStr_code(port->code, port->error, buffer, size);
+        r = SPO_getErrorStr_code(port->code, port->error, buffer, bufferSize);
     }
     else r = SPOE_NULL;
     
@@ -322,6 +367,7 @@ SPO_code SPO_template(SPO_port* port)
         r = -1;
 
         port->code = r;
+        updateInstance(port);
     }
     else r = SPOE_NULL;
     
@@ -332,6 +378,11 @@ SPO_code SPO_template(SPO_port* port)
 
 
 
+
+void updateInstance(SPO_port* port)
+{
+    port->good = (port->code == SPO_OK ? 1 : 0);
+}
 
 #ifdef OMW_PLAT_UNIX
 speed_t getUnixBaud(int baud, int* error)

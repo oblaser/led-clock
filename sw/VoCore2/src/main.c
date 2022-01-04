@@ -57,8 +57,7 @@ int main(int argc, char** argv)
         SPO_port portData;
         SPO_port* const port = &portData;
 
-        SPO_init(port);
-        APP_printSpoError("SPO_init", port, flags);
+        if(SPO_init(port) != SPO_OK) APP_printSpoError("SPO_init", port, flags);
         
         SPO_open(port, "/dev/ttyS1", 9600);
         APP_printSpoError("SPO_open", port, flags);
