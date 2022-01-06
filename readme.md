@@ -1,5 +1,5 @@
 # LED Clock
-> [Project Page](https://oblaser.ch/projekte/led-uhr/)
+> Pictures on the [projects page](https://oblaser.ch/projekte/led-uhr/)
 
 #### 2015
 Initially it should be a DCF77 driven clock. But the reception was too bad everywhere
