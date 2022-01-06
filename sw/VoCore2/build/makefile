@@ -31,7 +31,7 @@ $(exe): $(objs)
 
 install-scp: $(exe)
 	@echo "\033[94mscp\033[39m"
-	@sh ./spc-to-vocore.sh
+	@sh ./scp-to-vocore.sh
 	@echo "\033[92mDone\033[39m"
 
 $(obj_main): $(src_main) $(inc_appMain) $(inc_serialport)
