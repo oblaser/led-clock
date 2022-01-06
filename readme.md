@@ -1,9 +1,3 @@
-# LED Clock
+# LED Clock - Old Stuff
 
-- [Project Page](https://oblaser.ch/projekte/led-uhr/)
-
-## VoCore2
-
-> [VoCore2](https://vocore.io/v2.html)
-
-UART1 is used to communicate with the clock.
+See [readme > 2015](https://github.com/oblaser/led-clock#2015)
