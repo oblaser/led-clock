@@ -30,7 +30,6 @@
 
 #define INP_T       0x01
 #define INP_DCF     0x02
-#define INP_RX      0x04
 
 #define S_IDLE      1
 #define S_SYNC      2

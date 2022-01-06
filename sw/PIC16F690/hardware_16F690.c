@@ -288,9 +288,6 @@ void input_handler() {
     if(TCO) inp_neu |= INP_DCF;
     else inp_neu &= ~INP_DCF;
     
-    if(RX_READY) inp_neu |= INP_RX;
-    else inp_neu &= ~INP_RX;
-    
     // flanken
     inp_pos = ~inp_alt & inp_neu;
     inp_neg = inp_alt & ~inp_neu;

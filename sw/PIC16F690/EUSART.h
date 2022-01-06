@@ -29,11 +29,11 @@ if(RCIE && RCIF) RX_interrupt();
 
 #include <xc.h>
 
-#define RX_LENGTH       40
+#define RX_LENGTH       50
 #define TX_LENGTH       20
 
-#define RX_C_END_STRING   0x0D    // \r CR
-#define TX_C_END_STRING   0x0D    // \r CR
+#define RX_C_END_STRING   '\n'
+#define TX_C_END_STRING   '\n'
 
 #define RX_READY    rx_idle
 
