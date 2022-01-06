@@ -4,7 +4,7 @@
 #### 2015
 Initially it should be a DCF77 driven clock. But the reception was too bad everywhere
 the clock could be placed. Hence a Raspberry Pi 1B was used to send the time via UART
-to the microcontroller.
+to the microcontroller. See branch [old](https://github.com/oblaser/led-clock/tree/old).
 
 #### now
 The clock is a R&D platform for the VoCore2.
